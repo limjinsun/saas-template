@@ -1,0 +1,55 @@
+<!-- app/views/tenant_login_accounts/sessions/new_otp_login.html.erb -->
+<div class="auth-page auth-page-master-control min-h-[100svh] flex items-center justify-center px-4 py-10">
+  <div class="w-full max-w-md">
+    <div class="auth-card auth-card-danger rounded-[1.125rem] border p-6 sm:p-7">
+      <div class="mb-6 text-center">
+        <a href="<%= root_path %>" data-turbo="false" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-800">
+          SaaS Template
+        </a>
+
+        <h1 class="auth-brand-title mt-5 text-[1.7rem] font-semibold tracking-[-0.03em] leading-tight">Enter Login Code</h1>
+      </div>
+
+      <%= render "shared/flash" %>
+
+      <form action="<%= tenant_login_account_otp_path %>" method="post" autocomplete="off" class="space-y-3" data-turbo="false">
+        <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+
+        <% email_val  = (@params && @params[:email].presence) || params[:email] %>
+        <% tenant_val = (@params && @params[:tenant_id].presence) || params[:tenant_id] %>
+        <input type="hidden" name="email" value="<%= h(email_val) %>">
+        <input type="hidden" name="tenant_id" value="<%= h(tenant_val) %>">
+
+        <label class="auth-label block text-[11px] font-medium uppercase tracking-[0.08em]" for="otp_code">6-Digit Code</label>
+        <input
+          id="otp_code"
+          type="text"
+          name="otp_code"
+          placeholder="••••••"
+          class="auth-input block w-full rounded-xl border p-3 text-sm tracking-[0.35em] text-center"
+          inputmode="numeric"
+          pattern="[0-9]{6}"
+          maxlength="6"
+          autocomplete="one-time-code"
+          autocapitalize="off"
+          autocorrect="off"
+          spellcheck="false"
+          data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-protonpass-ignore="true"
+          required  
+          aria-describedby="otp_help"
+        >
+
+        <p id="otp_help" class="auth-meta text-[11px] leading-5">
+          Enter the code sent to your email.
+        </p>
+
+        <button
+          type="submit"
+          class="auth-button w-full inline-flex items-center justify-center gap-1.5 rounded-xl border px-3 py-3 text-sm font-medium">
+          Verify &amp; Sign in
+        </button>
+      </form>
+
+    </div>
+  </div>
+</div>

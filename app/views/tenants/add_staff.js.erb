@@ -1,0 +1,9 @@
+(function () {
+  var body = document.getElementById('x-modal-body');
+  if (!body) return;
+
+  window.dispatchEvent(new CustomEvent('open-modal'));
+  document.getElementById('x-modal-title').innerHTML = "Add Staff"
+  body.innerHTML = "<%= j render('tenants/add_staff_form') %>";
+
+})();

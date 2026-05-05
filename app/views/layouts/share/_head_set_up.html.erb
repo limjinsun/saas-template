@@ -1,0 +1,101 @@
+    <meta name="turbo-cache-control" content="no-preview">
+    <meta name="rails-env" content="<%= Rails.env %>">
+
+    <% canonical_host = ENV.fetch("APP_CANONICAL_HOST", "example.com") %>
+    <% if Rails.env.production? && request.host == canonical_host %>
+      <link rel="canonical" href="https://<%= request.host %><%= request.path %>">
+      <meta name="description" content="<%= content_for?(:meta_description) ? yield(:meta_description) : 'Multi-tenant SaaS starter with Rails, React, and a custom admin shell.' %>">
+      <meta name="keywords" content="<%= content_for?(:meta_keywords) ? yield(:meta_keywords) : 'multi-tenant saas, rails starter, react admin template' %>">
+      <meta property="og:type" content="website">
+      <meta property="og:url" content="https://<%= request.host %><%= request.path %>">
+      <meta property="og:title" content="<%= content_for?(:title) ? yield(:title) : 'SaaS Template' %>">
+      <meta property="og:description" content="<%= content_for?(:meta_description) ? yield(:meta_description) : 'Multi-tenant SaaS starter with Rails, React, and a custom admin shell.' %>">
+      <meta name="twitter:card" content="summary_large_image">
+      <meta name="twitter:title" content="<%= content_for?(:title) ? yield(:title) : 'SaaS Template' %>">
+      <meta name="twitter:description" content="<%= content_for?(:meta_description) ? yield(:meta_description) : 'Multi-tenant SaaS starter with Rails, React, and a custom admin shell.' %>">
+    <% else %>
+      <meta name="robots" content="noindex, nofollow">
+    <% end %>
+
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="/favicon.ico">
+    
+    <!--<link href="https://cdn.jsdelivr.net/npm/flowbite@4.0.0/dist/flowbite.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/flowbite-datepicker@1.3.2/dist/css/datepicker.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" referrerpolicy="no-referrer">-->
+    <!-- Dependencies bundled into 1 css file -->
+    <%= stylesheet_link_tag "vendor.bundle", "data-turbo-track": "reload" %>
+
+
+    <!--<script src="https://cdn.jsdelivr.net/npm/@hotwired/turbo@8.0.20/dist/turbo.es2017-umd.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs"></script>        
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@4.0.0/dist/flowbite.turbo.min.js" data-turbo-track="reload"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/flowbite-datepicker@1.3.2/dist/js/datepicker-full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@rails/ujs@7.1.3-4/app/assets/javascripts/rails-ujs.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" data-turbo-track="reload"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js" referrerpolicy="no-referrer" data-turbo-track="reload"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" referrerpolicy="no-referrer" data-turbo-track="reload"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.4/jspdf.plugin.autotable.min.js" referrerpolicy="no-referrer" data-turbo-track="reload"></script>-->
+    <!-- Dependencies bundled into 1 js file -->
+    <%= javascript_include_tag "vendor.bundle", "data-turbo-track": "reload", defer: true %>
+    <%= javascript_include_tag "application_react", "data-turbo-track": "reload", defer: true %>
+
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@200..800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+    <style>
+      html, body {
+        font-family: "Oxanium", ui-sans-serif, system-ui, -apple-system,
+                     "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
+                     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+        background-color: var(--bg-base, #faf8f5);
+        color: var(--text-secondary, #3d3830);
+      }
+      :root { --header-h: 64px; --footer-h: 56px; }
+    </style>
+    <style>
+      .pagy {
+        --B: 1; --H: 0; --S: 0; --L: 50; --A: 1;
+        --spacing: 0.125rem; --padding: 0.35rem; --rounding: 0.25rem;
+        --border-width: 1px; --font-size: 0.6875rem; --font-weight: 600; --line-height: 1.2;
+        --text:               hsla(var(--H) var(--S) calc(var(--L) - (25 * var(--B))) / var(--A));
+        --text-hover:         hsla(var(--H) var(--S) calc(var(--L) - (30 * var(--B))) / var(--A));
+        --text-current:       hsla(var(--H) var(--S) calc(100 * (var(--B) + 1)) / var(--A));
+        --background:         hsla(var(--H) var(--S) calc(var(--L) + (30 * var(--B))) / var(--A));
+        --background-hover:   hsla(var(--H) var(--S) calc(var(--L) + (20 * var(--B))) / var(--A));
+        --background-current: hsla(var(--H) var(--S) var(--L) / var(--A));
+        --background-input:   hsla(var(--H) var(--S) calc(var(--L) + (45 * var(--B))) / var(--A));
+        color: var(--text); font-size: var(--font-size); line-height: var(--line-height); font-weight: var(--font-weight); display: flex;
+      }
+      .pagy > :not([hidden]) ~ :not([hidden]) { margin-left: calc(var(--spacing) * (1 - var(--space-reverse, 0))); margin-right: calc(var(--spacing) * var(--space-reverse, 0)); }
+      .rtl .pagy > :not([hidden]) ~ :not([hidden]) { --space-reverse: 1; }
+      .pagy a:not([role="separator"]) { display: inline-flex; align-items: center; justify-content: center; min-width: 1.25rem; height: 1.25rem; padding: 0 calc(var(--padding) * .6); border-radius: var(--rounding); border: var(--border-width) solid #374151; background-color: var(--background); color: inherit; text-decoration: none; }
+      .pagy a[href]:hover { background-color: var(--background-hover); color: var(--text-hover); }
+      .pagy a:not([href]) { cursor: default; opacity: .6; }
+      .pagy a[role="link"]:not([aria-current]) { opacity: .6; }
+      .pagy a[aria-current] { background-color: var(--background-current); color: var(--text-current); border-color: var(--text); }
+      .pagy label { white-space: nowrap; display: inline-block; border: var(--border-width) solid #374151; border-radius: var(--rounding); background-color: var(--background); padding: .15rem .4rem; }
+      .pagy label input { all: unset; border: var(--border-width) solid #374151; border-radius: calc(var(--rounding) / 2) !important; background-color: var(--background-input); padding: .05rem .25rem; }
+    </style>
+    <style>
+      /* Make Flowbite datepicker popup a bit smaller */
+      .datepicker {
+        font-size: 0.75rem;        /* smaller text */
+        transform: scale(0.85);     /* shrink overall */
+        transform-origin: top left;
+      }
+
+      /* slightly tighter cells */
+      .datepicker .datepicker-cell {
+        padding: 0.1rem 0.1rem;
+      }
+
+      /* header buttons a bit smaller */
+      .datepicker .datepicker-header button {
+        padding: 0.1rem 0.1rem;
+      }
+    </style>

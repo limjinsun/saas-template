@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="<%= form_authenticity_token %>">
+  <title>SaaS Template Admin</title>
+  <link rel="stylesheet" href="/v2/adminFrame/assets/admin_frame.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=Oxanium:wght@200..800&family=Manrope:wght@300..700&family=Sora:wght@300..700&family=Albert+Sans:wght@300..700&family=Figtree:wght@300..700&family=Instrument+Sans:wght@400..700&family=Red+Hat+Display:wght@300..700&family=Intel+One+Mono:wght@300..700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      prefix: 'tw-',       // All Tailwind classes prefixed: tw-text-xs, tw-bg-white, etc.
+      important: true,     // Prefixed classes get !important — wins over CoreUI when used
+      corePlugins: {
+        preflight: false,  // Don't reset CoreUI's base styles
+      },
+    }
+  </script>
+</head>
+<body>
+  <%# Single mount point — React takes over from here %>
+  <div id="admin-frame-root"
+    data-props='<%= json_escape({
+      bootstrapUrl: "/v2/template/bootstrap",
+      currentUser: {
+        email: current_tenant_user&.email,
+        initials: [current_tenant_user&.try(:first_name), current_tenant_user&.try(:last_name)].compact.map { |n| n[0] }.join.upcase.presence || current_tenant_user&.email&.slice(0, 2)&.upcase,
+        type: current_tenant_user&.class&.name
+      },
+      tenantTimeZone: ActiveSupport::TimeZone[Current.tenant&.time_zone || "UTC"].tzinfo.identifier
+    }.to_json) %>'>
+  </div>
+
+  <script src="/v2/adminFrame/assets/admin_frame.js"></script>
+</body>
+</html>

@@ -1,0 +1,234 @@
+<div id="x-modal-root"
+     data-turbo-permanent
+     x-data="{ open:false, fullscreen:false }"
+     x-cloak
+     x-show="open"
+     x-transition.opacity.duration.200ms
+     @open-modal.window="
+       open = true;
+       fullscreen = !!($event.detail && $event.detail.fullscreen);
+     "
+     @close-modal.window="open = false"
+     @keydown.escape.window="open && $dispatch('close-modal')"
+     x-init="
+       $watch('open', value => {
+         document.body.style.overflow = value ? 'hidden' : '';
+       })
+     "
+     class="fixed inset-0 z-50">
+
+  <div class="absolute inset-0 bg-black/60" @click="$dispatch('close-modal')"></div>
+
+  <!-- Container: centered vs fullscreen -->
+  <div class="absolute inset-0 flex overflow-y-auto"
+       :class="fullscreen
+         ? 'items-stretch justify-stretch'
+         : 'items-center justify-center p-4'">
+
+    <div class="relative w-full bg-surface text-primary flex flex-col"
+         :class="fullscreen
+           ? 'max-w-none h-full rounded-none'
+           : 'max-w-2xl max-h-[95vh] rounded-sm border border-theme shadow-xl'">
+
+      <div class="flex items-center justify-between border-b border-theme px-4 py-3 sticky top-0 bg-surface z-10">
+        <h2 class="text-sm font-semibold" id="x-modal-title"></h2>
+        <button
+          class="px-2 py-1 text-xs text-secondary hover:bg-elevated"
+          @click="$dispatch('close-modal')">
+          ✕
+        </button>
+      </div>
+
+      <div id="x-modal-body" class="p-3 overflow-y-auto">
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<style>
+ /* Position the stack & set container width */
+  #toast-container.toast-bottom-right {
+    position: fixed;
+    z-index: 999999;
+    top: auto !important;
+    bottom: 18px !important;    /* Position from bottom */
+    right: 18px !important;     /* Position from right */
+    left: auto !important;
+    transform: none;            /* Remove centering */
+    width: 100%;
+    max-width: 360px !important;
+  }
+
+  /* Make each toast fill the container width */
+  #toast-container.toast-bottom-right > .toast {
+    width: 100% !important;
+    box-sizing: border-box;
+  } 
+  /* Base toast style */
+  #toast-container > .toast {
+    position: relative;
+    background-color: #020617;           /* default (overridden per type) */
+    color: #e5e7eb;                      /* gray-200 */
+    border-radius: 0.25rem;
+    border: 1px solid #1f2937;           /* gray-800 */
+    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.4),
+                0 8px 10px -6px rgba(0,0,0,0.4);
+    padding: 0.75rem 2.25rem 0.75rem 0.9rem;
+    font-size: 0.875rem;
+    text-align: left;
+    backdrop-filter: blur(8px);
+  }
+  #toast-container > .toast { 
+    opacity: 0.95; /* slightly transparent for glass effect */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5); /* softer shadow */
+  }
+
+  /* Optional: Add a subtle hover effect */
+  #toast-container > .toast:hover {
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.9);
+    opacity: 1;
+  }
+
+  /* Type-specific backgrounds + accent bars */
+
+  /* INFO: brighter blue so it stands out */
+  #toast-container > .toast-info {
+    border-left: 3px solid #38bdf8;      /* sky-400 */
+    background-color: #0369a1;           /* sky-700-ish, clearly blue */
+  }
+
+  #toast-container > .toast-success {
+    border-left: 3px solid #22c55e;      /* emerald-500 */
+    background-color: #022c22;           /* emerald-950 */
+  }
+
+  #toast-container > .toast-warning {
+    border-left: 3px solid #f59e0b;      /* amber-500 */
+    background-color: #451a03;           /* amber-950 */
+  }
+
+  #toast-container > .toast-error {
+    border-left: 3px solid #f97373;      /* red/rose-ish */
+    background-color: #450a0a;           /* red-950 */
+  }
+
+  /* Extra left padding for icon area */
+  #toast-container > .toast {
+    padding: 0.75rem 2.25rem 0.75rem 2.6rem;
+  }
+
+  #toast-container > .toast-info,
+  #toast-container > .toast-success,
+  #toast-container > .toast-warning,
+  #toast-container > .toast-error {
+    background-position: 0.75rem center;
+    background-size: 1rem auto;
+  }
+
+  /* Message text */
+  #toast-container > .toast .toast-message {
+    margin: 0;
+    line-height: 1.4;
+    text-align: left;
+  }
+
+  /* Close button: top-right */
+  #toast-container > .toast .toast-close-button {
+    position: absolute;
+    top: 0.45rem;
+    right: 0.55rem;
+    float: none;
+    margin: 0;
+    padding: 0;
+    opacity: 0.6;
+    font-size: 14px;
+    color: #9ca3af;
+    text-shadow: none;
+  }
+
+  #toast-container > .toast .toast-close-button:hover {
+    opacity: 1;
+    color: #e5e7eb;
+  }
+
+  @media (max-width: 640px) {
+    #toast-container.toast-bottom-right {  /* <--- Update class name here */
+      max-width: calc(100% - 2rem);
+      right: 1rem !important;              /* Optional: Adjust spacing for mobile */
+      bottom: 1rem !important;
+    }
+  }
+</style>
+
+<div id="flash-toasts" data-turbo-temporary>
+  <% if flash.any? %>
+    <script>
+      (function(){
+        function fire(){
+          if (!window.toastr) return;
+          
+          toastr.options.closeButton = true;
+          toastr.options.progressBar = true;
+          toastr.options.newestOnTop = false;
+          toastr.options.timeOut = 15000;
+          toastr.options.extendedTimeOut = 2000;
+          toastr.options.positionClass = "toast-bottom-right";
+
+          <% flash.delete(:timedout) %>
+          <% flash.each do |type, message| %>
+            toastr["<%= ({ notice: "info", alert: "error" }[type.to_sym] || type).to_s %>"]("<%= j(message) %>");
+          <% end %>
+        }
+
+        if (window.Turbo) {
+          document.addEventListener("turbo:load", fire, { once: true });
+        } else if (document.readyState === "loading") {
+          document.addEventListener("DOMContentLoaded", fire, { once: true });
+        } else {
+          fire();
+        }
+      })();
+    </script>
+  <% end %>
+</div>
+
+
+
+<script>
+  document.addEventListener("turbo:load", () => {
+    document.body.style.transform = "translateZ(0)";
+    requestAnimationFrame(() => {
+      document.body.style.transform = "";
+    });
+  });
+</script>
+
+<script>
+  function initAlpineForTurbo() {
+    if (!window.Alpine) return;
+    Alpine.initTree(document.body);
+  }
+
+  document.addEventListener("turbo:load", initAlpineForTurbo);
+  document.addEventListener("turbo:render", initAlpineForTurbo);
+  document.addEventListener("turbo:frame-load", initAlpineForTurbo);
+</script>
+
+
+<script>
+  (function () {
+    function disableAutocomplete() {
+      document.querySelectorAll("form").forEach(function (form) {
+        form.setAttribute("autocomplete", "off");
+      });
+      document.querySelectorAll("input:not([type='hidden'])").forEach(function (input) {
+        input.setAttribute("autocomplete", "off");
+      });
+    }
+    document.addEventListener("turbo:load", disableAutocomplete);
+    document.addEventListener("turbo:render", disableAutocomplete);
+    document.addEventListener("turbo:frame-load", disableAutocomplete);
+    document.addEventListener("DOMContentLoaded", disableAutocomplete);
+  })();
+</script>

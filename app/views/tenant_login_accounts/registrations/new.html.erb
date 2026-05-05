@@ -1,0 +1,103 @@
+<!-- app/views/tenant_login_accounts/registrations/new.html.erb -->
+<% if nil %>
+<div class="min-h-[100svh] bg-base text-primary flex items-center justify-center px-4">
+  <div class="w-full max-w-sm">
+    <!-- Brand / header -->
+    <div class="mb-6 text-center">
+      <h1 class="text-xl font-semibold tracking-tight">Create your account</h1>
+      <% if Current.respond_to?(:tenant) && Current.tenant %>
+        <p class="text-[11px] text-muted mt-1">
+          Workspace: <span class="text-primary"><%= Current.tenant.name %></span>
+          <span class="text-muted">(@<%= Current.tenant.subdomain %>)</span>
+        </p>
+      <% end %>
+    </div>
+
+    <%= render "shared/flash" %>
+
+    <!-- Errors -->
+    <% if resource.errors.any? %>
+      <div class="mb-3 rounded-sm border p-2 text-xs flash-bad">
+        <div class="font-medium mb-1"><%= pluralize(resource.errors.count, "error") %> prevented sign up:</div>
+        <ul class="list-disc pl-4 space-y-0.5">
+          <% resource.errors.full_messages.each do |m| %>
+            <li><%= m %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="rounded-sm border border-theme bg-surface p-4 shadow-sm">
+      <%= form_with model: resource,
+                    scope: resource_name,
+                    url: registration_path(resource_name),
+                    local: true,
+                    html: { 'x-data' => '{ loading: false }', '@submit' => 'loading = true', class: 'space-y-3' } do |f| %>
+
+        <!-- If your model has tenant_id and you're on a known tenant, pass it through -->
+        <% if Current.respond_to?(:tenant) && Current.tenant && resource.respond_to?(:tenant_id) %>
+          <%= f.hidden_field :tenant_id, value: Current.tenant.id %>
+        <% end %>
+
+        <!-- Email -->
+        <div>
+          <label class="block mb-1 text-[11px] text-secondary" for="email">Email</label>
+          <%= f.email_field :email,
+                autofocus: true,
+                autocomplete: "email",
+                required: true,
+                class: "block w-full rounded-sm border border-theme bg-elevated p-2 text-sm text-primary placeholder-gray-500 focus:ring-blue-600 focus:border-blue-600",
+                placeholder: "you@example.com" %>
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label class="block mb-1 text-[11px] text-secondary" for="password">Password</label>
+          <%= f.password_field :password,
+                autocomplete: "new-password",
+                required: true,
+                minlength: Devise.password_length.min,
+                class: "block w-full rounded-sm border border-theme bg-elevated p-2 text-sm text-primary placeholder-gray-500 focus:ring-blue-600 focus:border-blue-600",
+                placeholder: "Choose a strong password" %>
+          <p class="mt-1 text-[10px] text-muted">
+            At least <%= Devise.password_length.min %> characters.
+          </p>
+        </div>
+
+        <!-- Password confirmation -->
+        <div>
+          <label class="block mb-1 text-[11px] text-secondary" for="password_confirmation">Confirm password</label>
+          <%= f.password_field :password_confirmation,
+                autocomplete: "new-password",
+                required: true,
+                class: "block w-full rounded-sm border border-theme bg-elevated p-2 text-sm text-primary placeholder-gray-500 focus:ring-blue-600 focus:border-blue-600",
+                placeholder: "Re-enter your password" %>
+        </div>
+
+        <!-- Submit -->
+        <div>
+          <%= f.button type: :submit,
+                       class: "w-full inline-flex items-center justify-center gap-1.5 rounded-sm border px-3 py-2 text-sm font-medium btn-soft-blue focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed",
+                       'x-bind:disabled' => 'loading',
+                       'x-bind:aria-busy' => 'loading' do %>
+            <svg x-show="loading" x-cloak class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+              <path d="M22 12a10 10 0 00-10-10" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+            </svg>
+            <span x-show="!loading">Create account</span>
+            <span x-show="loading" x-cloak>Creating…</span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Footer links -->
+    <div class="mt-3 text-center text-[11px] text-muted">
+      Already have an account?
+      <%= link_to "Sign in", new_session_path(resource_name), class: "text-blue-600 hover:text-blue-200" %>
+      <span class="mx-1 opacity-40">•</span>
+      <%= link_to "Back to home", root_path, data: { turbo: false }, class: "text-blue-600 hover:text-blue-200" %>
+    </div>
+  </div>
+</div>
+<% end %>

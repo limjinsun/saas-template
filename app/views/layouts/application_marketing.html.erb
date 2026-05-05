@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth <%= yield(:html_class) %>">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <% canonical_host = Rails.env.production? ? ENV.fetch("APP_CANONICAL_HOST", "example.com") : nil %>
+
+  <% if Rails.env.production? && canonical_host %>
+    <%# ── Canonical ──────────────────────────────────────────────── %>
+    <link rel="canonical" href="https://<%= canonical_host %><%= request.path %>">
+
+    <%# ── Primary SEO ─────────────────────────────────────────────── %>
+    <title><%= content_for?(:title) ? yield(:title) : "SaaS Template" %></title>
+    <meta name="description" content="<%= content_for?(:meta_description) ? yield(:meta_description) : 'Generic multi-tenant SaaS starter built with Rails and React.' %>" />
+    <meta name="keywords"    content="<%= content_for?(:meta_keywords)    ? yield(:meta_keywords)    : 'multi-tenant saas, rails starter, react admin template' %>" />
+    <meta name="robots"      content="index, follow" />
+    <meta name="author"      content="SaaS Template" />
+
+    <%# ── Open Graph (LinkedIn, Facebook, Slack) ─────────────────── %>
+    <meta property="og:type"        content="website" />
+    <meta property="og:site_name"   content="SaaS Template" />
+    <meta property="og:url"         content="https://<%= canonical_host %><%= request.path %>" />
+    <meta property="og:title"       content="<%= content_for?(:title)            ? yield(:title)            : 'SaaS Template' %>" />
+    <meta property="og:description" content="<%= content_for?(:meta_description) ? yield(:meta_description) : 'Generic multi-tenant SaaS starter built with Rails and React.' %>" />
+    <meta property="og:image"       content="<%= content_for?(:og_image)         ? yield(:og_image)         : "https://#{canonical_host}/og-default.png" %>" />
+    <meta property="og:image:width"  content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <%# ── Twitter / X Card ───────────────────────────────────────── %>
+    <meta name="twitter:card"        content="summary_large_image" />
+    <meta name="twitter:title"       content="<%= content_for?(:title)            ? yield(:title)            : 'SaaS Template' %>" />
+    <meta name="twitter:description" content="<%= content_for?(:meta_description) ? yield(:meta_description) : 'Generic multi-tenant SaaS starter built with Rails and React.' %>" />
+    <meta name="twitter:image"       content="<%= content_for?(:og_image)         ? yield(:og_image)         : "https://#{canonical_host}/og-default.png" %>" />
+
+    <%# ── JSON-LD Structured Data (optional per-page override) ───── %>
+    <% if content_for?(:structured_data) %>
+      <script type="application/ld+json"><%= yield(:structured_data) %></script>
+    <% end %>
+
+  <% else %>
+    <%# ── Non-production: block all crawlers ─────────────────────── %>
+    <meta name="robots" content="noindex, nofollow" />
+    <title><%= content_for?(:title) ? yield(:title) : "SaaS Template" %></title>
+  <% end %>
+
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <%= stylesheet_link_tag "vendor.bundle", "data-turbo-track": "reload" %>
+  <style>
+    body { font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; }
+    .font-mono, pre, code { font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace; }
+  </style>
+
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <%= yield :head %>
+</head>
+
+<body class="<%= content_for?(:body_class) ? yield(:body_class) : nil %>">
+
+  <%= yield %>
+  <%= yield :before_body_end %>
+
+</body>
+</html>

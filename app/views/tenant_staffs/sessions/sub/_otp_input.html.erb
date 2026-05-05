@@ -1,0 +1,40 @@
+<!-- app/views/tenant_staffs/sessions/sub/_otp_input.html.erb -->
+<form action="<%= tenant_staff_otp_path %>" method="post" autocomplete="off" class="space-y-3" data-turbo="false">
+  <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+
+  <% email_val  = (@params && @params[:email].presence) || params[:email] %>
+  <% tenant_val = (@params && @params[:tenant_id].presence) || params[:tenant_id] %>
+  <input type="hidden" name="email" value="<%= h(email_val) %>">
+  <input type="hidden" name="tenant_id" value="<%= h(tenant_val) %>">
+
+  <label class="auth-label block text-[11px] font-medium uppercase tracking-[0.08em]" for="otp_code">6-Digit Code</label>
+  <input
+    id="otp_code"
+    type="text"
+    name="otp_code"
+    placeholder="••••••"
+    class="auth-input block w-full rounded-xl border p-3 text-sm tracking-[0.35em] text-center"
+    inputmode="numeric"
+    pattern="[0-9]{6}"
+    maxlength="6"
+    autocomplete="one-time-code"
+    autocapitalize="off"
+    autocorrect="off"
+    spellcheck="false"
+    data-lpignore="true" data-1p-ignore="true" data-bwignore="true" data-protonpass-ignore="true"
+    required
+    aria-describedby="otp_help"
+  >
+
+  <p id="otp_help" class="auth-meta text-[11px] leading-5">
+    Enter the code sent to your email.
+  </p>
+
+  <button
+    type="submit"
+    class="auth-button w-full inline-flex items-center justify-center gap-1.5 rounded-xl border px-3 py-3 text-sm font-medium">
+    Verify &amp; Sign in
+  </button>
+</form>
+
+  

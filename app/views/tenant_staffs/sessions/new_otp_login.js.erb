@@ -1,0 +1,8 @@
+<!-- app/views/tenant_staffs/sessions/new_otp_login.js.erb -->
+(function(){
+  var el = document.getElementById("otp-pane");
+  if (!el) return;
+  el.innerHTML = "<%= j render(partial: 'tenant_staffs/sessions/sub/otp_input', locals: {}) %>";
+  if (el.scrollIntoView) { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  if (window.__otpLoaded) { window.__otpLoaded(); }
+})();

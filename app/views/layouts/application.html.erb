@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script>
+      // Restore theme before paint to avoid flash
+      (function() {
+        var t = localStorage.getItem('theme');
+        if (t === 'dark') document.documentElement.classList.add('dark');
+      })();
+    </script>
+    <title><%= content_for(:title) || "SaaS Template" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= render "layouts/share/head_set_up" %>
+    <%= yield :head %>
+
+    <% 
+     user_agent = request.user_agent.to_s
+     is_safari = user_agent.match?(/Safari/) && !user_agent.match?(/Chrome/) 
+    %>
+
+    <style>
+      /* ── Alpine.js ── */
+      [x-cloak], .loading { display: none !important; }
+
+      /* ── Theme tokens ── */
+      :root {
+        --bg-base:        #faf8f5;
+        --bg-surface:     #ffffff;
+        --bg-elevated:    #f3f0ea;
+        --bg-hover:       rgba(0,0,0,0.05);
+        --border:         #e2ddd7;
+        --border-subtle:  #ebe7e0;
+        --text-primary:   #18160e;
+        --text-secondary: #3d3830;
+        --text-muted:     #86807a;
+        --text-faint:     #afa9a3;
+        --glass-bg:       rgba(250,248,245,0.92);
+        --glass-border:   rgba(0,0,0,0.08);
+      }
+      .dark {
+        --bg-base:        #030712;
+        --bg-surface:     #080f1a;
+        --bg-elevated:    #0f1829;
+        --bg-hover:       rgba(255,255,255,0.05);
+        --border:         #1a2436;
+        --border-subtle:  #111827;
+        --text-primary:   #f3f4f6;
+        --text-secondary: #d1d5db;
+        --text-muted:     #9ca3af;
+        --text-faint:     #6b7280;
+        --glass-bg:       rgba(3,7,18,0.90);
+        --glass-border:   rgba(255,255,255,0.05);
+      }
+
+      /* ── Semantic utilities ── */
+      .bg-base               { background-color: var(--bg-base); }
+      .bg-surface            { background-color: var(--bg-surface); }
+      .bg-elevated           { background-color: var(--bg-elevated); }
+      .text-primary          { color: var(--text-primary); }
+      .text-secondary        { color: var(--text-secondary); }
+      .text-muted            { color: var(--text-muted); }
+      .text-faint            { color: var(--text-faint); }
+      .border-theme          { border-color: var(--border); }
+      .border-subtle         { border-color: var(--border-subtle); }
+      .divide-theme > * + * { border-color: var(--border); }
+      .hover\:bg-elevated:hover  { background-color: var(--bg-elevated); }
+      .hover\:bg-hover:hover     { background-color: var(--bg-hover); }
+      .hover\:text-primary:hover { color: var(--text-primary); }
+      .ring-theme                { --tw-ring-color: var(--border); }
+
+      /* ── Status / amortization badges ── */
+      .badge-blue    { background:#dbeafe; color:#1e40af; border-color:#bfdbfe; }
+      .badge-purple  { background:#f3e8ff; color:#6b21a8; border-color:#e9d5ff; }
+      .badge-red     { background:#fee2e2; color:#991b1b; border-color:#fecaca; }
+      .badge-emerald { background:#d1fae5; color:#065f46; border-color:#a7f3d0; }
+      .badge-sky     { background:#e0f2fe; color:#075985; border-color:#bae6fd; }
+      .badge-amber   { background:#fef3c7; color:#78350f; border-color:#fde68a; }
+      .badge-gray    { background:#f3f4f6; color:#6b7280; border-color:#e5e7eb; }
+      .dark .badge-blue    { background:rgba(30,64,175,.2);  color:#93c5fd; border-color:rgba(59,130,246,.3); }
+      .dark .badge-purple  { background:rgba(88,28,135,.3);  color:#d8b4fe; border-color:rgba(139,92,246,.3); }
+      .dark .badge-red     { background:rgba(127,29,29,.3);  color:#fca5a5; border-color:rgba(220,38,38,.3); }
+      .dark .badge-emerald { background:rgba(6,78,59,.3);    color:#6ee7b7; border-color:rgba(16,185,129,.3); }
+      .dark .badge-sky     { background:rgba(7,89,133,.3);   color:#7dd3fc; border-color:rgba(14,165,233,.3); }
+      .dark .badge-amber   { background:rgba(120,53,15,.3);  color:#fbbf24; border-color:rgba(245,158,11,.3); }
+      .dark .badge-gray    { background:#1f2937;             color:#9ca3af; border-color:#374151; }
+
+      /* ── Soft action buttons ── */
+      .btn-soft-blue { background:rgba(219,234,254,0.65); color:#1d4ed8; border-color:rgba(147,197,253,0.55); }
+      .btn-soft-blue:hover { background:rgba(191,219,254,0.85); }
+      .dark .btn-soft-blue { background:rgba(30,64,175,0.25); color:#93c5fd; border-color:rgba(59,130,246,0.3); }
+      .dark .btn-soft-blue:hover { background:rgba(30,64,175,0.4); }
+      .btn-soft-danger { background:rgba(254,226,226,0.65); color:#991b1b; border-color:rgba(254,202,202,0.55); }
+      .btn-soft-danger:hover { background:rgba(254,202,202,0.85); }
+      .dark .btn-soft-danger { background:rgba(127,29,29,0.22); color:#fca5a5; border-color:rgba(220,38,38,0.3); }
+      .dark .btn-soft-danger:hover { background:rgba(127,29,29,0.38); }
+
+      /* ── Tab active states ── */
+      .tab-active-blue   { background:rgba(219,234,254,0.7); color:#1d4ed8; }
+      .tab-active-purple { background:rgba(243,232,255,0.7); color:#6b21a8; }
+      .dark .tab-active-blue   { background:rgba(30,64,175,0.3);  color:#93c5fd; }
+      .dark .tab-active-purple { background:rgba(88,28,135,0.3);  color:#d8b4fe; }
+
+      /* ── Flash messages ── */
+      .flash-ok      { border-color:rgba(6,182,212,0.4);   background:rgba(236,253,245,0.95); color:#065f46; }
+      .flash-bad     { border-color:rgba(220,38,38,0.3);   background:rgba(254,242,242,0.95); color:#991b1b; }
+      .flash-warning { border-color:rgba(245,158,11,0.35); background:rgba(255,251,235,0.95); color:#78350f; }
+      .flash-info    { border-color:rgba(59,130,246,0.35); background:rgba(239,246,255,0.95); color:#1e40af; }
+      .dark .flash-ok      { border-color:rgba(6,182,212,0.3);   background:rgba(6,78,59,0.25);     color:#6ee7b7; }
+      .dark .flash-bad     { border-color:rgba(220,38,38,0.3);   background:rgba(127,29,29,0.25);   color:#fca5a5; }
+      .dark .flash-warning { border-color:rgba(245,158,11,0.3);  background:rgba(120,53,15,0.25);   color:#fbbf24; }
+      .dark .flash-info    { border-color:rgba(59,130,246,0.3);  background:rgba(30,64,175,0.25);   color:#93c5fd; }
+
+      /* ── Inline panel banners ── */
+      .panel-info    { background:rgba(239,246,255,0.8); border-color:rgba(147,197,253,0.45); color:#1e40af; }
+      .panel-warning { background:rgba(255,251,235,0.85); border-color:rgba(217,119,6,0.35); color:#78350f; }
+      .dark .panel-info    { background:rgba(30,64,175,0.15);  border-color:rgba(59,130,246,0.25);  color:#93c5fd; }
+      .dark .panel-warning { background:rgba(120,53,15,0.15);  border-color:rgba(217,119,6,0.3);   color:#fbbf24; }
+
+      /* ── Dynamic Alpine.js badge classes (cash events / breakdown) ── */
+      .badge-dir-in        { background:rgba(209,250,229,0.8); color:#065f46; border-color:rgba(167,243,208,0.9); }
+      .badge-dir-in-void   { background:rgba(209,250,229,0.25); color:rgba(6,95,70,0.45); border-color:rgba(167,243,208,0.3); }
+      .badge-dir-out       { background:rgba(254,243,199,0.8); color:#92400e; border-color:rgba(253,211,77,0.7); }
+      .badge-dir-out-void  { background:rgba(254,243,199,0.25); color:rgba(120,53,15,0.45); border-color:rgba(253,211,77,0.3); }
+      .badge-cat-repayment      { background:rgba(219,234,254,0.8); color:#1e40af; border-color:rgba(191,219,254,0.9); }
+      .badge-cat-repayment-void { background:rgba(219,234,254,0.25); color:rgba(30,64,175,0.4); border-color:rgba(191,219,254,0.3); }
+      .dark .badge-dir-in        { background:rgba(6,78,59,0.25);    color:#6ee7b7; border-color:rgba(16,185,129,0.4); }
+      .dark .badge-dir-in-void   { background:rgba(6,78,59,0.08);    color:rgba(110,231,183,0.35); border-color:rgba(16,185,129,0.15); }
+      .dark .badge-dir-out       { background:rgba(120,53,15,0.25);  color:#fbbf24; border-color:rgba(245,158,11,0.4); }
+      .dark .badge-dir-out-void  { background:rgba(120,53,15,0.08);  color:rgba(251,191,36,0.35); border-color:rgba(245,158,11,0.15); }
+      .dark .badge-cat-repayment      { background:rgba(30,64,175,0.2);  color:#93c5fd; border-color:rgba(59,130,246,0.3); }
+      .dark .badge-cat-repayment-void { background:rgba(30,64,175,0.06); color:rgba(147,197,253,0.35); border-color:rgba(59,130,246,0.12); }
+
+      /* ── Column group tints (installment schedule) ── */
+      .bg-tint-amber   { background-color: rgba(255,251,235,0.7); }
+      .bg-tint-emerald { background-color: rgba(240,253,244,0.7); }
+      .bg-tint-rose    { background-color: rgba(255,241,242,0.7); }
+      .dark .bg-tint-amber   { background-color: rgba(120,53,15,0.18); }
+      .dark .bg-tint-emerald { background-color: rgba(6,78,59,0.18); }
+      .dark .bg-tint-rose    { background-color: rgba(136,19,55,0.18); }
+      .border-tint-amber   { border-color: rgba(253,211,77,0.5); }
+      .border-tint-emerald { border-color: rgba(52,211,153,0.35); }
+      .border-tint-rose    { border-color: rgba(251,113,133,0.35); }
+      .dark .border-tint-amber   { border-color: rgba(180,83,9,0.4); }
+      .dark .border-tint-emerald { border-color: rgba(6,95,70,0.4); }
+      .dark .border-tint-rose    { border-color: rgba(159,18,57,0.3); }
+
+      /* ── Glass nav ── */
+      .glass-header {
+        background: var(--glass-bg);
+        border-color: var(--glass-border);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+      }
+      @supports not ((-webkit-backdrop-filter: blur(0)) or (backdrop-filter: blur(0))) {
+        .glass-header { background: var(--glass-bg); opacity: 0.98; }
+      }
+
+      /* ── Auth surface tokens ── */
+      :root {
+        --auth-page-bg:
+          radial-gradient(circle at top left, rgba(74,154,212,0.18), transparent 28%),
+          radial-gradient(circle at top right, rgba(21,61,94,0.12), transparent 24%),
+          linear-gradient(180deg, #f6f9fc 0%, #edf2f7 100%);
+        --auth-shell-bg: rgba(255,255,255,0.24);
+        --auth-shell-border: rgba(21,61,94,0.08);
+        --auth-shell-shadow: 0 28px 60px rgba(15,29,47,0.10);
+        --auth-card-bg: rgba(255,255,255,0.86);
+        --auth-card-border: rgba(21,61,94,0.12);
+        --auth-card-shadow: 0 18px 40px rgba(15,29,47,0.08);
+        --auth-dropdown-bg: #ffffff;
+        --auth-title: #0f1d2f;
+        --auth-body: #3e4d5d;
+        --auth-muted: #6c7b8d;
+        --auth-hairline: #d7e0ea;
+        --auth-link: #153d5e;
+        --auth-link-hover: #0f2d46;
+        --auth-chip-bg: rgba(255,255,255,0.42);
+        --auth-input-bg: rgba(247,249,252,0.96);
+        --auth-input-border: #d4deea;
+        --auth-input-border-focus: #2874b0;
+        --auth-input-shadow-focus: 0 0 0 0.25rem rgba(40,116,176,0.14);
+        --auth-accent: #153d5e;
+        --auth-accent-hover: #112f4c;
+        --auth-accent-strong: #0f2338;
+        --auth-accent-soft: rgba(21,61,94,0.08);
+        --auth-accent-soft-hover: rgba(21,61,94,0.12);
+        --auth-accent-ink: #153d5e;
+        --auth-info-bg: rgba(228,236,244,0.78);
+        --auth-info-border: rgba(21,61,94,0.12);
+        --auth-info-text: #37506a;
+        --auth-overlay: rgba(15,29,47,0.30);
+      }
+      .dark {
+        --auth-page-bg:
+          radial-gradient(circle at top left, rgba(74,154,212,0.16), transparent 28%),
+          radial-gradient(circle at top right, rgba(21,61,94,0.18), transparent 24%),
+          linear-gradient(180deg, #08111c 0%, #0d1826 100%);
+        --auth-shell-bg: rgba(10,18,30,0.34);
+        --auth-shell-border: rgba(133,147,163,0.10);
+        --auth-shell-shadow: 0 28px 64px rgba(0,0,0,0.42);
+        --auth-card-bg: rgba(11,20,32,0.84);
+        --auth-card-border: rgba(133,147,163,0.16);
+        --auth-card-shadow: 0 20px 44px rgba(0,0,0,0.34);
+        --auth-dropdown-bg: #0d1826;
+        --auth-title: #eef4fb;
+        --auth-body: #c2cfdd;
+        --auth-muted: #8ea0b5;
+        --auth-hairline: rgba(133,147,163,0.18);
+        --auth-link: #8ec0eb;
+        --auth-link-hover: #b0d4f1;
+        --auth-chip-bg: rgba(255,255,255,0.04);
+        --auth-input-bg: rgba(15,24,41,0.92);
+        --auth-input-border: rgba(133,147,163,0.18);
+        --auth-input-border-focus: #4a9ad4;
+        --auth-input-shadow-focus: 0 0 0 0.25rem rgba(74,154,212,0.16);
+        --auth-accent: #1f5a87;
+        --auth-accent-hover: #276c9f;
+        --auth-accent-strong: #143f61;
+        --auth-accent-soft: rgba(74,154,212,0.10);
+        --auth-accent-soft-hover: rgba(74,154,212,0.16);
+        --auth-accent-ink: #c9e3f8;
+        --auth-info-bg: rgba(21,61,94,0.20);
+        --auth-info-border: rgba(74,154,212,0.18);
+        --auth-info-text: #b9d3ea;
+        --auth-overlay: rgba(4,10,18,0.52);
+      }
+
+      .auth-page {
+        position: relative;
+        isolation: isolate;
+        background: var(--auth-page-bg);
+      }
+      .auth-page::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background:
+          linear-gradient(135deg, rgba(255,255,255,0.28), transparent 40%),
+          linear-gradient(180deg, transparent 0%, rgba(21,61,94,0.02) 100%);
+        z-index: -1;
+      }
+      .auth-page-master-control {
+        --auth-page-bg:
+          radial-gradient(circle at top left, rgba(193,86,99,0.12), transparent 30%),
+          radial-gradient(circle at top right, rgba(122,31,42,0.10), transparent 26%),
+          linear-gradient(180deg, #f6edef 0%, #f1e6e8 100%);
+        --auth-card-bg: rgba(252,253,255,0.94);
+        --auth-card-border: rgba(169,61,72,0.14);
+        --auth-card-shadow: 0 22px 48px rgba(122,31,42,0.10);
+        --auth-dropdown-bg: #fff8f8;
+        --auth-link: #8f2433;
+        --auth-link-hover: #741725;
+        --auth-input-bg: rgba(255,250,250,0.96);
+        --auth-input-border: #e7c9ce;
+        --auth-input-border-focus: #b23a4b;
+        --auth-input-shadow-focus: 0 0 0 0.25rem rgba(178,58,75,0.14);
+        --auth-accent: #a22d3e;
+        --auth-accent-hover: #8d2232;
+        --auth-accent-strong: #721827;
+        --auth-accent-soft: rgba(162,45,62,0.08);
+        --auth-accent-soft-hover: rgba(162,45,62,0.14);
+        --auth-info-bg: rgba(250,236,238,0.82);
+        --auth-info-border: rgba(169,61,72,0.14);
+        --auth-info-text: #7d2f3c;
+        --auth-overlay: rgba(61,14,22,0.32);
+      }
+      .dark .auth-page-master-control {
+        --auth-page-bg:
+          radial-gradient(circle at top left, rgba(193,86,99,0.12), transparent 30%),
+          radial-gradient(circle at top right, rgba(122,31,42,0.18), transparent 26%),
+          linear-gradient(180deg, #170f13 0%, #221317 100%);
+        --auth-card-bg: rgba(31,18,23,0.92);
+        --auth-card-border: rgba(190,90,104,0.16);
+        --auth-card-shadow: 0 24px 52px rgba(0,0,0,0.30);
+        --auth-dropdown-bg: #241419;
+        --auth-link: #efb0b9;
+        --auth-link-hover: #f6cad0;
+        --auth-input-bg: rgba(42,22,28,0.92);
+        --auth-input-border: rgba(190,90,104,0.20);
+        --auth-input-border-focus: #d96a79;
+        --auth-input-shadow-focus: 0 0 0 0.25rem rgba(217,106,121,0.16);
+        --auth-accent: #b23a4b;
+        --auth-accent-hover: #c84e5e;
+        --auth-accent-strong: #821f2f;
+        --auth-accent-soft: rgba(217,106,121,0.10);
+        --auth-accent-soft-hover: rgba(217,106,121,0.16);
+        --auth-info-bg: rgba(122,31,42,0.22);
+        --auth-info-border: rgba(217,106,121,0.18);
+        --auth-info-text: #efc2c8;
+        --auth-overlay: rgba(28,10,14,0.54);
+      }
+      .auth-shell {
+        border: 1px solid var(--auth-shell-border);
+        background: var(--auth-shell-bg);
+        box-shadow: var(--auth-shell-shadow);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+      .auth-brand-kicker {
+        color: var(--auth-link);
+        background: var(--auth-accent-soft);
+      }
+      .auth-brand-title { color: var(--auth-title); }
+      .auth-brand-copy { color: var(--auth-body); }
+      .auth-workspace {
+        color: var(--auth-muted);
+        border-color: var(--auth-hairline);
+        background: var(--auth-chip-bg);
+      }
+      .auth-workspace strong { color: var(--auth-title); font-weight: 600; }
+      .auth-meta { color: var(--auth-muted); }
+      .auth-meta-strong { color: var(--auth-title); }
+      .auth-card {
+        background: var(--auth-card-bg);
+        border-color: var(--auth-card-border);
+        box-shadow: var(--auth-card-shadow);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+      }
+      .auth-card-danger {
+        --auth-card-bg: linear-gradient(180deg, rgba(255,251,251,0.97) 0%, rgba(255,244,245,0.95) 100%);
+        --auth-card-border: rgba(169,61,72,0.18);
+        --auth-card-shadow: 0 24px 52px rgba(122,31,42,0.12);
+      }
+      .dark .auth-card-danger {
+        --auth-card-bg: linear-gradient(180deg, rgba(31,17,22,0.96) 0%, rgba(43,20,27,0.94) 100%);
+        --auth-card-border: rgba(190,90,104,0.18);
+        --auth-card-shadow: 0 26px 56px rgba(0,0,0,0.34);
+      }
+      .auth-divider { border-color: var(--auth-hairline); }
+      .auth-label { color: var(--auth-muted); }
+      .auth-input {
+        background: var(--auth-input-bg);
+        border-color: var(--auth-input-border);
+        color: var(--auth-title);
+      }
+      .auth-input::placeholder { color: var(--auth-muted); }
+      .auth-input:focus {
+        border-color: var(--auth-input-border-focus);
+        box-shadow: var(--auth-input-shadow-focus);
+        outline: none;
+      }
+      .auth-addon {
+        background: var(--auth-accent-soft);
+        border-color: var(--auth-input-border);
+        color: var(--auth-muted);
+      }
+      .auth-dropdown {
+        background: var(--auth-dropdown-bg);
+        border-color: var(--auth-card-border);
+        box-shadow: var(--auth-card-shadow);
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+      }
+      .auth-option-active {
+        background: var(--auth-accent-soft);
+        color: var(--auth-title);
+      }
+      .auth-option-idle {
+        color: var(--auth-title);
+      }
+      .auth-option-idle:hover { background: var(--auth-accent-soft-hover); }
+      .auth-note {
+        background: var(--auth-info-bg);
+        border-color: var(--auth-info-border);
+        color: var(--auth-info-text);
+      }
+      .auth-link {
+        color: var(--auth-link);
+        transition: color 0.2s ease;
+      }
+      .auth-link:hover { color: var(--auth-link-hover); }
+      .auth-button {
+        background: linear-gradient(135deg, var(--auth-accent) 0%, var(--auth-accent-strong) 100%);
+        border-color: transparent;
+        color: #fff;
+        box-shadow: 0 12px 28px rgba(15,29,47,0.14);
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      }
+      .auth-button:hover {
+        background: linear-gradient(135deg, var(--auth-accent-hover) 0%, var(--auth-accent) 100%);
+        box-shadow: 0 16px 30px rgba(15,29,47,0.18);
+        transform: translateY(-1px);
+      }
+      .auth-button:focus {
+        outline: none;
+        box-shadow: 0 0 0 0.25rem rgba(40,116,176,0.16), 0 12px 28px rgba(15,29,47,0.14);
+      }
+      .auth-button:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+      .auth-overlay {
+        background: var(--auth-overlay);
+        color: #fff;
+      }
+    </style>
+
+    <script>
+      // Perfectly handles Flowbite + Turbo integration
+      document.addEventListener("turbo:load", function () {
+        if (window.initFlowbite) {
+          window.initFlowbite(); 
+        }
+      });
+    </script>
+  </head>
+
+  <body x-cloak class="antialiased bg-base">
+    <%= yield %>
+    <%= render "layouts/share/body_set_up" %>
+    
+    <script>
+      // Show the body as soon as the DOM is ready 
+      // Tailwind CDN will usually have finished its first pass by then
+      document.addEventListener("DOMContentLoaded", () => {
+        document.body.style.visibility = "visible";
+      });
+    </script>
+
+    <% if is_safari || safari_browser? %>
+    <script>
+      console.log("Safari Browser!!")
+    </script>
+    <% end %>
+  </body>
+</html>

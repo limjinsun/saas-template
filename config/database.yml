@@ -1,0 +1,24 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS", 5) %>
+
+development:
+  primary:
+    <<: *default
+    url: <%= ENV["SAAS_TEMPLATE_DATABASE_URL_DEVELOPMENT"] %>
+
+test:
+  primary:
+    <<: *default
+    url: <%= ENV["SAAS_TEMPLATE_DATABASE_URL_TEST"] %>
+
+staging:
+  primary:
+    <<: *default
+    url: <%= ENV["SAAS_TEMPLATE_DATABASE_URL_STAGING"] %>
+
+production:
+  primary:
+    <<: *default
+    url: <%= ENV["SAAS_TEMPLATE_DATABASE_URL_PRODUCTION"] %>

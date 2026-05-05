@@ -1,0 +1,34 @@
+<!-- FLASH MESSAGE HERE -->
+  <div class="space-y-2 my-2">
+    <% flash.delete(:timedout) %>
+    <% flash.each do |type, msg| %>
+      <% t = type.to_s %>
+      <% tone =
+            if %w[notice success info].include?(t)         then :ok
+            elsif %w[alert error danger].include?(t)  then :bad
+            elsif %w[warning].include?(t)             then :head_up
+            else :info end %>
+
+      <% css =
+            case tone
+            when :ok      then "w-full border rounded-md px-3 py-3 text-xs flex items-start gap-2 flash-ok"
+            when :bad     then "w-full border rounded-md px-3 py-3 text-xs flex items-start gap-2 flash-bad"
+            when :head_up then "w-full border rounded-md px-3 py-3 text-xs flex items-start gap-2 flash-warning"
+            else               "w-full border rounded-md px-3 py-3 text-xs flex items-start gap-2 flash-info"
+            end %>
+
+
+      <div class="<%= css %>">
+        <%# simple icon %>
+        <% if tone == :ok %>
+          <svg class="mt-0.5 h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 0 1 0 1.414l-7.25 7.25a1 1 0 0 1-1.414 0l-3-3a1 1 0 1 1 1.414-1.414l2.293 2.293 6.543-6.543a1 1 0 0 1 1.414 0Z" clip-rule="evenodd"/></svg>
+        <% elsif tone == :bad %>
+          <svg class="mt-0.5 h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-11.5a.75.75 0 0 0-1.5 0v4a.75.75 0 0 0 1.5 0v-4ZM10 14a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z" clip-rule="evenodd"/></svg>
+        <% else %>
+          <svg class="mt-0.5 h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16Zm.75-11.5a.75.75 0 1 0-1.5 0v5a.75.75 0 0 0 1.5 0v-5ZM10 14a1 1 0 1 0 0 2 1 1 0 0 0 0-2Z"/></svg>
+        <% end %>
+        <div class="leading-snug"><%= msg %></div>
+      </div>
+    <% end %>
+  </div>
+<!-- FLASH MESSAGE END -->

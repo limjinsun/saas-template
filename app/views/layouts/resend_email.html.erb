@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style>
+      /* Workspace email layout */
+      body {
+        background-color: #f8fafc; /* Very light slate */
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        margin: 0;
+        padding: 0;
+        width: 100% !important;
+      }
+      .wrapper { width: 100%; background-color: #f8fafc; table-layout: fixed; padding: 40px 0; }
+      .main-container { max-width: 600px; margin: 0 auto; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+      
+      /* Header & Logo */
+      .header { padding: 32px 32px 24px 32px; border-bottom: 1px solid #f1f5f9; }
+      .logo-box { background-color: #1e3a8a; /* Deep Navy Blue */ border-radius: 6px; width: 32px; height: 32px; text-align: center; vertical-align: middle; color: #ffffff; font-weight: bold; font-size: 18px; line-height: 32px; }
+      .brand-text { padding-left: 12px; font-size: 20px; font-weight: 800; color: #0f172a; text-transform: uppercase; letter-spacing: -0.5px; }
+      
+      /* Body Content */
+      .content { padding: 32px; color: #475569; font-size: 15px; line-height: 1.6; }
+      .content h1, .content h2 { color: #0f172a; font-weight: 700; margin-top: 0; }
+      
+      /* Institutional Footer */
+      .footer { background-color: #f8fafc; padding: 32px; text-align: center; border-top: 1px solid #e2e8f0; }
+      .footer-text { color: #64748b; font-size: 12px; line-height: 1.5; margin-bottom: 16px; }
+      
+      /* System Status Indicator */
+      .system-status { display: inline-block; background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 4px; padding: 6px 12px; font-size: 10px; font-weight: 700; color: #1e3a8a; text-transform: uppercase; letter-spacing: 1px; }
+      .status-dot { color: #2563eb; font-size: 14px; line-height: 0; vertical-align: middle; margin-right: 4px; }
+    </style>
+  </head>
+  <body>
+    <table class="wrapper" cellpadding="0" cellspacing="0" role="presentation">
+      <tr>
+        <td align="center">
+          <table class="main-container" cellpadding="0" cellspacing="0" role="presentation" width="100%" style="max-width: 600px;">
+            
+            <tr>
+              <td class="header" align="left">
+                <table cellpadding="0" cellspacing="0" role="presentation">
+                  <tr>
+                    <td class="logo-box">&#x25A3;</td>
+                    <td class="brand-text">SaaS Template</td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="content" align="left">
+                <%= yield %>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="footer">
+                <div class="footer-text">
+                  <strong>SaaS Template</strong><br>
+                  Multi-tenant workspace infrastructure for internal teams.<br><br>
+                  This is a secure, automated system notification. Please do not reply to this email.
+                </div>
+                
+                <div class="footer-text" style="margin-bottom: 24px;">
+                  &copy; <%= Time.current.year %> SaaS Template. All rights reserved.
+                </div>
+
+                <div class="system-status">
+                  <span class="status-dot">&bull;</span> System: Operational
+                </div>
+
+                <div style="margin-top: 32px; font-size: 10px; color: #cbd5e1; font-family: 'JetBrains Mono', monospace; text-transform: uppercase;">
+                  Ref: <%= SecureRandom.hex(4) %>-<%= Time.current.to_i %>
+                </div>
+              </td>
+            </tr>
+
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

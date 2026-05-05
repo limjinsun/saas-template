@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <base href="<%= request.base_url %>/" />
+
+  <style>
+    @page { size: A4; margin: 12mm; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+    body {
+      font-family: -apple-system, system-ui, Segoe UI, Roboto, Arial, sans-serif;
+      color: #111;
+      font-size: 12px;
+      line-height: 1.35;
+      margin: 0;
+      background: #fff;
+    }
+
+    .muted { color: #666; }
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+    .avoid-break { break-inside: avoid; page-break-inside: avoid; }
+
+    .doc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .brand { display: flex; gap: 10px; align-items: center; }
+    .logo { width: 34px; height: 34px; border-radius: 8px; background: #111; display: inline-block; }
+    .title { font-size: 18px; font-weight: 800; letter-spacing: 0.2px; }
+    .doc-meta { text-align: right; font-size: 11px; color: #666; }
+
+    .summary {
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      padding: 10px;
+      margin: 12px 0 14px;
+    }
+    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 14px; }
+    .k { font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 0.04em; }
+    .v { font-size: 12px; font-weight: 700; margin-top: 2px; }
+
+    .pill {
+      display: inline-block;
+      border: 1px solid #ddd;
+      background: #f6f7f9;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 10px;
+      color: #333;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead { display: table-header-group; }
+    tfoot { display: table-footer-group; }
+    th, td { border: 1px solid #ddd; padding: 6px 7px; vertical-align: top; }
+    th {
+      background: #f3f4f6;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #333;
+      text-align: left;
+    }
+
+    .section-title { font-size: 13px; font-weight: 800; margin: 10px 0 8px; }
+
+    .note {
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid #ddd;
+      font-size: 10px;
+      color: #666;
+    }
+  </style>
+</head>
+
+<body>
+  <%= yield %>
+</body>
+</html>
