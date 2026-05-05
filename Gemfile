@@ -69,7 +69,7 @@ gem "base32", "~> 0.3.4"
 gem "pagy", "~> 43.0"
 gem "good_job"
 
-gem "ruby-lsp-rspec", "~> 0.1.28", group: :development
+gem "ruby-lsp-rspec", "~> 0.1.29", group: :development
 gem "faraday"
 
 gem "engine_b", path: "engines/engine_b"
